@@ -1,0 +1,5 @@
+error: #[propfuzz] requires at least one argument
+ --> $DIR/no-args.rs:9:1
+  |
+9 | fn no_args() {}
+  | ^^^^^^^^^^^^
