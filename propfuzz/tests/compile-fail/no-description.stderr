@@ -1,0 +1,5 @@
+error: #[propfuzz] requires either a doc comment or description = "..."
+ --> $DIR/no-description.rs:9:1
+  |
+9 | fn no_description(_: usize) {}
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^

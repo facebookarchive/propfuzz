@@ -1,0 +1,36 @@
+[package]
+name = "propfuzz"
+version = "0.1.0"
+description = "Combine property-based testing and fuzzing."
+repository = "https://github.com/facebookincubator/propfuzz"
+authors = ["Rain <rain1@fb.com>"]
+license = "MIT OR Apache-2.0"
+edition = "2018"
+readme = "README.md"
+exclude = [
+    # Readme template that doesn't need to be included.
+    "README.tpl",
+]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+proptest = "0.10"
+propfuzz-macro = { path = "../propfuzz-macro", version = "0.1.0", optional = true }
+
+[dev-dependencies]
+pretty_assertions = "0.6.1"
+trybuild = "1"
+
+[features]
+default = ["macro"]
+macro = ["propfuzz-macro"]
+
+[[test]]
+name = "basic"
+required-features = ["macro"]
+
+[[test]]
+name = "trybuild"
+required-features = ["macro"]

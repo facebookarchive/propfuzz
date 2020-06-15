@@ -1,0 +1,35 @@
+error: #[propfuzz] is only supported on top-level functions
+  --> $DIR/non-top-level.rs:13:13
+   |
+13 |     fn fuzz(&self, _: Vec<u8>) {}
+   |             ^^^^^
+
+error: #[propfuzz] is only supported on top-level functions
+  --> $DIR/non-top-level.rs:17:17
+   |
+17 |     fn fuzz_mut(&mut self, _: Vec<u8>) {}
+   |                 ^^^^^^^^^
+
+error: #[propfuzz] is only supported on top-level functions
+  --> $DIR/non-top-level.rs:21:21
+   |
+21 |     fn fuzz_consume(self, _: Vec<u8>) {}
+   |                     ^^^^
+
+error: struct is not supported in `trait`s or `impl`s
+  --> $DIR/non-top-level.rs:24:5
+   |
+24 |     #[propfuzz]
+   |     ^^^^^^^^^^^
+   |
+   = help: consider moving the struct out to a nearby module scope
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: implementation is not supported in `trait`s or `impl`s
+  --> $DIR/non-top-level.rs:24:5
+   |
+24 |     #[propfuzz]
+   |     ^^^^^^^^^^^
+   |
+   = help: consider moving the implementation out to a nearby module scope
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
