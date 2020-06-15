@@ -1,0 +1,2 @@
+# This is a seed for basic::propfuzz_failing, used as a persistence file.
+cc 9d9e0738ba4b746103afd27e3f27560a350403b42908446f8056af5fd3844937 # shrinks to ([0, 1],)

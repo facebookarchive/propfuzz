@@ -1,0 +1,12 @@
+[package]
+name = "propfuzz"
+version = "0.1.0"
+authors = ["Rain <rain1@fb.com>"]
+edition = "2018"
+
+[dependencies]
+proptest = "0.10"
+propfuzz-derive = { path = "../propfuzz-derive", version = "0.1.0", optional = true }
+
+[features]
+derive = ["propfuzz-derive"]
