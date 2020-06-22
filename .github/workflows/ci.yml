@@ -45,7 +45,8 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           # Build all targets to ensure examples are built as well.
-          command: build --all-targets
+          command: build
+          args: --all-targets
       - name: Test
         uses: actions-rs/cargo@v1
         with:
@@ -63,8 +64,10 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           # Build all targets to ensure examples are built as well.
-          command: build --all-targets --all-features
+          command: build
+          args: --all-targets --all-features
       - name: Test
         uses: actions-rs/cargo@v1
         with:
-          command: test --all-features
+          command: test
+          args: --all-features
