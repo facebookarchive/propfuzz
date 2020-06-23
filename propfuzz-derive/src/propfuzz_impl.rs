@@ -6,8 +6,8 @@ use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use syn::{
-    Attribute, AttributeArgs, Block, Expr, FnArg, Index, ItemFn, Lit, Meta, Pat, PatType,
-    Signature, Type,
+    Attribute, AttributeArgs, Block, Expr, FnArg, Index, ItemFn, Lit, Meta, NestedMeta, Pat,
+    PatType, Signature, Type,
 };
 
 pub(crate) fn propfuzz_impl(attr: AttributeArgs, item: ItemFn) -> Result<TokenStream, TokenStream> {
@@ -34,7 +34,7 @@ impl<'a> PropfuzzFn<'a> {
     const STRUCT_PREFIX: &'static str = "__PROPFUZZ__";
 
     /// Creates a new instance of `PropfuzzFn`.
-    fn new(attr: &'a AttributeArgs, item: &'a ItemFn) -> Result<Self> {
+    fn new(attr: &'a [NestedMeta], item: &'a ItemFn) -> Result<Self> {
         #[derive(Debug, FromMeta)]
         struct MacroArgs {
             #[darling(default)]
@@ -201,12 +201,10 @@ impl<'a> PropfuzzFnBody<'a> {
             .inputs
             .iter()
             .map(|param| match param {
-                FnArg::Receiver(receiver) => {
-                    return Err(Error::new_spanned(
-                        receiver,
-                        "#[propfuzz] is only supported on top-level functions",
-                    ));
-                }
+                FnArg::Receiver(receiver) => Err(Error::new_spanned(
+                    receiver,
+                    "#[propfuzz] is only supported on top-level functions",
+                )),
                 FnArg::Typed(param) => PropfuzzParam::new(param),
             })
             .collect::<Result<Vec<_>>>()?;
