@@ -1,7 +1,10 @@
 // Copyright (c) The propfuzz Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-//! Combine property-based testing with fuzzing.
+//! Rust toolkit to combine property-based testing with fuzzing.
+//!
+//! For more, see the [`README`](https://github.com/facebookincubator/propfuzz/blob/trunk/README.md)
+//! at the root of the `propfuzz` repository.
 
 mod propfuzz;
 pub mod runtime;
