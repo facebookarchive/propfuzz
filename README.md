@@ -1,17 +1,25 @@
-# propfuzz: structured fuzzing through property-based testing, in Rust
+# propfuzz: Rust tools to combine coverage-guided fuzzing with property-based testing
 
 This repository contains the source code for:
 
-* [`propfuzz`](propfuzz): a Rust library for combining [proptest](https://github.com/AltSysrq/proptest/) with
-  coverage-guided fuzzers 
+* [`propfuzz`](propfuzz): a Rust library for adapting the `[proptest](https://github.com/AltSysrq/proptest/)` framework
+  with coverage-guided fuzzers. 
 * [`propfuzz-macro`](propfuzz-macro): procedural macros to make writing `propfuzz` tests easy 
 
-The code in this repository is in a **pre-release** state and is under active development.
+The code in this repository is in a **very early** state and is under active development.
 
 ## Vision
 
-The overarching goal of `propfuzz` is to make writing new unstructured and structured fuzz targets *seamless* and
-*transparent*. Here's what we would like `propfuzz` to look like:
+The overarching goal of `propfuzz` is to make it easy to write new fuzz targets, whether *unstructured* or *structured*.
+
+**`propfuzz` does not reinvent the wheel.** It adapts the existing property-based test framework `proptest` to also work
+for fuzzing. If your project has an existing investment in `proptest`, all of it should be reusable for coverage-guided
+fuzzing with minimal work.
+
+(Read about the [differences between `proptest` and
+`quickcheck`](https://altsysrq.github.io/proptest-book/proptest/vs-quickcheck.html)).
+
+Here's what we expect `proptest` to look like when it's ready:
 
 ### Developer interface
 
@@ -53,7 +61,7 @@ fn reverse(#[strategy(vec(any::<u32>(), 0..64))] mut list: Vec<u32>) {
 
 ### Running fuzzers
 
-Every test with `#[propfuzz]` annotated to it should also becomes a fuzz target. It should be easy to run `#[propfuzz]`
+Every test with `#[propfuzz]` annotated to it should also become a fuzz target. It should be easy to run `#[propfuzz]`
 targets in one of two modes:
 * as a standard property-based test, for local test runs and immediate CI feedback
 * using a coverage-guided fuzzing engine such as [libFuzzer](https://llvm.org/docs/LibFuzzer.html),
