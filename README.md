@@ -2,7 +2,7 @@
 
 This repository contains the source code for:
 
-* [`propfuzz`](propfuzz): a Rust library for adapting the `[proptest](https://github.com/AltSysrq/proptest/)` framework
+* [`propfuzz`](propfuzz): a Rust library for adapting the [`proptest`](https://github.com/AltSysrq/proptest/) framework
   with coverage-guided fuzzers. 
 * [`propfuzz-macro`](propfuzz-macro): procedural macros to make writing `propfuzz` tests easy 
 
