@@ -1,19 +1,20 @@
 // Copyright (c) The propfuzz Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+use crate::config::{PropfuzzConfig, PropfuzzConfigBuilder};
 use crate::errors::*;
-use darling::FromMeta;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
+use syn::punctuated::Punctuated;
 use syn::{
     Attribute, AttributeArgs, Block, Expr, FnArg, Index, ItemFn, Lit, Meta, NestedMeta, Pat,
-    PatType, Signature, Type,
+    PatType, Signature, Token, Type,
 };
 
 pub(crate) fn propfuzz_impl(attr: AttributeArgs, item: ItemFn) -> Result<TokenStream, TokenStream> {
     let propfuzz_fn = match PropfuzzFn::new(&attr, &item) {
         Ok(propfuzz_fn) => propfuzz_fn,
-        Err(err) => return Err(err.into_token_stream()),
+        Err(err) => return Err(err.to_compile_error()),
     };
 
     Ok(propfuzz_fn.into_token_stream())
@@ -24,8 +25,8 @@ pub(crate) fn propfuzz_impl(attr: AttributeArgs, item: ItemFn) -> Result<TokenSt
 struct PropfuzzFn<'a> {
     name: &'a Ident,
     description: String,
-    attrs: &'a Vec<Attribute>,
-    config: PropfuzzFnConfig,
+    other_attrs: Vec<&'a Attribute>,
+    config: PropfuzzConfig,
     struct_name: Ident,
     body: PropfuzzFnBody<'a>,
 }
@@ -35,26 +36,18 @@ impl<'a> PropfuzzFn<'a> {
 
     /// Creates a new instance of `PropfuzzFn`.
     fn new(attr: &'a [NestedMeta], item: &'a ItemFn) -> Result<Self> {
-        #[derive(Debug, FromMeta)]
-        struct MacroArgs {
-            #[darling(default)]
-            description: Option<String>,
-            #[darling(default)]
-            cases: Option<u32>,
-            #[darling(default)]
-            fork: bool,
-        }
+        let mut errors = ErrorList::new();
+        let mut config_builder = PropfuzzConfigBuilder::default();
 
-        let macro_args = MacroArgs::from_list(attr)?;
+        // Apply the arguments from the first #[propfuzz] invocation.
+        config_builder.apply_args(attr, &mut errors);
 
         let name = &item.sig.ident;
-        let attrs = &item.attrs;
 
-        // Read the description from the attribute, otherwise from the doc comment.
-        let description = if let Some(description) = macro_args.description {
-            description
-        } else {
-            let description = attrs
+        // Read the description from the doc comment.
+        let description = {
+            let description = item
+                .attrs
                 .iter()
                 .filter_map(|attr| {
                     if attr.path.is_ident("doc") {
@@ -65,25 +58,42 @@ impl<'a> PropfuzzFn<'a> {
                 })
                 .collect::<Result<Vec<_>>>()?;
             if description.is_empty() {
-                return Err(Error::new_spanned(
+                errors.combine(Error::new_spanned(
                     &item.sig,
-                    "#[propfuzz] requires either a doc comment or description = \"...\"",
+                    "#[propfuzz] requires a description as a doc comment",
                 ));
             }
             description.join("\n")
         };
 
-        let body = PropfuzzFnBody::new(&item.sig, &item.block)?;
+        // Read arguments from remaining #[propfuzz] attributes.
+        let (propfuzz_attrs, other_attrs) = item
+            .attrs
+            .iter()
+            .partition::<Vec<_>, _>(|attr| attr.path.is_ident("propfuzz"));
+        for attr in propfuzz_attrs {
+            if let Some(args) = errors.combine_opt(|| {
+                attr.parse_args_with(Punctuated::<NestedMeta, Token![,]>::parse_terminated)
+            }) {
+                config_builder.apply_args(&args, &mut errors);
+            }
+        }
+
+        let body = match PropfuzzFnBody::new(&item.sig, &item.block) {
+            Ok(body) => body,
+            Err(error) => return Err(errors.combine_finish(error)),
+        };
 
         let struct_name = format_ident!("{}{}", Self::STRUCT_PREFIX, name);
+
+        // If any errors were collected, return them.
+        errors.finish()?;
+
         Ok(Self {
             name: &item.sig.ident,
             description,
-            attrs,
-            config: PropfuzzFnConfig {
-                cases: macro_args.cases,
-                fork: macro_args.fork,
-            },
+            other_attrs,
+            config: config_builder.finish(),
             struct_name,
             body,
         })
@@ -93,15 +103,16 @@ impl<'a> PropfuzzFn<'a> {
 impl<'a> ToTokens for PropfuzzFn<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let Self {
-            attrs,
             name,
             description,
+            other_attrs,
             config,
             struct_name,
             body,
             ..
         } = self;
 
+        let proptest_config = &config.proptest;
         let types = body.types();
         let name_pats = body.name_pats();
 
@@ -112,7 +123,7 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
 
         tokens.extend(quote! {
             #[test]
-            #(#attrs )*
+            #(#other_attrs )*
             fn #name() {
                 ::propfuzz::runtime::execute_as_proptest(#struct_name);
             }
@@ -133,7 +144,7 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
                 }
 
                 fn proptest_config(&self) -> ::propfuzz::test::test_runner::Config {
-                    #config
+                    #proptest_config
                 }
 
                 fn execute(&self, __propfuzz_test_runner: &mut ::propfuzz::test::test_runner::TestRunner)
@@ -147,33 +158,6 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
                 }
             }
         });
-    }
-}
-
-/// Proptest config for a single function.
-#[derive(Debug)]
-struct PropfuzzFnConfig {
-    cases: Option<u32>,
-    fork: bool,
-}
-
-/// Generates a ProptestConfig for this function.
-impl ToTokens for PropfuzzFnConfig {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        let Self { cases, fork } = self;
-
-        tokens.extend(quote! {
-            let mut config = ::propfuzz::test::test_runner::Config::default();
-            config.fork = #fork;
-            config.source_file = Some(file!());
-        });
-
-        if let Some(cases) = cases {
-            tokens.extend(quote! {
-                config.cases = #cases;
-            });
-        }
-        tokens.extend(quote! { config })
     }
 }
 
@@ -203,17 +187,25 @@ impl<'a> PropfuzzFnBody<'a> {
             ));
         }
 
+        let mut errors = ErrorList::new();
+
         let params = sig
             .inputs
             .iter()
-            .map(|param| match param {
-                FnArg::Receiver(receiver) => Err(Error::new_spanned(
-                    receiver,
-                    "#[propfuzz] is only supported on top-level functions",
-                )),
-                FnArg::Typed(param) => PropfuzzParam::new(param),
+            .filter_map(|param| match param {
+                FnArg::Receiver(receiver) => {
+                    errors.combine(Error::new_spanned(
+                        receiver,
+                        "#[propfuzz] is only supported on top-level functions",
+                    ));
+                    None
+                }
+                FnArg::Typed(param) => errors.combine_opt(|| PropfuzzParam::new(param)),
             })
-            .collect::<Result<Vec<_>>>()?;
+            .collect::<Vec<_>>();
+
+        // If there are any errors, return them.
+        errors.finish()?;
 
         Ok(Self { params, block })
     }

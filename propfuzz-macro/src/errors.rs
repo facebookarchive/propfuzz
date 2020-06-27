@@ -1,52 +1,70 @@
 // Copyright (c) The propfuzz Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use proc_macro2::{Span, TokenStream};
-use quote::ToTokens;
-use std::fmt;
+use std::mem;
+pub use syn::Error;
 
 /// The `Result` type.
 pub type Result<T, E = Error> = ::std::result::Result<T, E>;
 
-pub enum Error {
-    Syn(syn::Error),
-    Darling(darling::Error),
-    TokenStream(TokenStream),
+#[derive(Debug)]
+pub(crate) enum ErrorList {
+    None,
+    Some(Error),
 }
 
-impl From<syn::Error> for Error {
-    fn from(err: syn::Error) -> Self {
-        Error::Syn(err)
-    }
-}
-
-impl From<darling::Error> for Error {
-    fn from(err: darling::Error) -> Self {
-        Error::Darling(err)
-    }
-}
-
-impl From<TokenStream> for Error {
-    fn from(token_stream: TokenStream) -> Self {
-        Error::TokenStream(token_stream)
-    }
-}
-
-impl Error {
-    #[allow(dead_code)]
-    pub fn new<T: fmt::Display>(span: Span, message: T) -> Self {
-        Error::Syn(syn::Error::new(span, message))
+impl ErrorList {
+    pub(crate) fn new() -> Self {
+        ErrorList::None
     }
 
-    pub fn new_spanned<T: ToTokens, U: fmt::Display>(tokens: T, message: U) -> Self {
-        Error::Syn(syn::Error::new_spanned(tokens, message))
-    }
-
-    pub fn into_token_stream(self) -> TokenStream {
+    /// Combine this error with the existing list of errors.
+    pub(crate) fn combine(&mut self, error: Error) {
         match self {
-            Error::Syn(err) => err.to_compile_error(),
-            Error::Darling(err) => err.write_errors(),
-            Error::TokenStream(token_stream) => token_stream,
+            ErrorList::None => {
+                mem::replace(self, ErrorList::Some(error));
+            }
+            ErrorList::Some(original) => original.combine(error),
+        }
+    }
+
+    /// Combine this error and return the consolidated list of errors, consuming `self`.
+    pub(crate) fn combine_finish(self, error: Error) -> Error {
+        match self {
+            ErrorList::None => error,
+            ErrorList::Some(mut original) => {
+                original.combine(error);
+                original
+            }
+        }
+    }
+
+    pub(crate) fn combine_fn<F>(&mut self, f: F)
+    where
+        F: FnOnce() -> Result<()>,
+    {
+        if let Err(error) = f() {
+            self.combine(error);
+        }
+    }
+
+    pub(crate) fn combine_opt<F, T>(&mut self, f: F) -> Option<T>
+    where
+        F: FnOnce() -> Result<T>,
+    {
+        match f() {
+            Ok(val) => Some(val),
+            Err(error) => {
+                self.combine(error);
+                None
+            }
+        }
+    }
+
+    pub(crate) fn finish(self) -> Result<()> {
+        match self {
+            ErrorList::None => Ok(()),
+            ErrorList::Some(error) => Err(error),
         }
     }
 }
