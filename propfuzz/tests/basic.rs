@@ -112,3 +112,21 @@ fn propfuzz_failing() {
         "minimal test case"
     );
 }
+
+/// Test multiple #[propfuzz] annotations.
+#[propfuzz(cases = 1024)]
+#[propfuzz(fork = true)]
+fn multi(_: Vec<u8>) {}
+
+#[test]
+fn propfuzz_multi() {
+    assert_eq!(__PROPFUZZ__multi.name(), "basic::multi");
+    assert_eq!(
+        __PROPFUZZ__multi.description(),
+        "Test multiple #[propfuzz] annotations."
+    );
+
+    let config = __PROPFUZZ__multi.proptest_config();
+    assert_eq!(config.cases, 1024, "correct case count");
+    assert_eq!(config.fork, true, "correct fork setting");
+}

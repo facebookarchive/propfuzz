@@ -8,6 +8,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
+mod config;
 mod errors;
 mod propfuzz_impl;
 
