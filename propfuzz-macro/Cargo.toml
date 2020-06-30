@@ -11,3 +11,6 @@ proc-macro = true
 proc-macro2 = "1.0.18"
 quote = "1.0.7"
 syn = { version = "1.0.31", features = ["extra-traits", "full"] }
+
+[dev-dependencies]
+propfuzz = { path = "../propfuzz" }
