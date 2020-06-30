@@ -1,14 +1,14 @@
 // Copyright (c) The propfuzz Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-//! Runtime support for propfuzz.
+//! Runtime support.
 
-use crate::Propfuzz;
+use crate::traits::StructuredTarget;
 use proptest::test_runner::{TestError, TestRunner};
 use std::fmt;
 
 /// Executes a propfuzz target as a standard property-based test.
-pub fn execute_as_proptest(fuzz_target: impl Propfuzz) {
+pub fn execute_as_proptest(fuzz_target: impl StructuredTarget) {
     let mut config = fuzz_target.proptest_config();
     config.test_name = Some(fuzz_target.name());
 
@@ -36,7 +36,7 @@ impl<'a, PF, T> TestErrorDisplay<'a, PF, T> {
 
 impl<'a, PF, T> fmt::Display for TestErrorDisplay<'a, PF, T>
 where
-    PF: Propfuzz<Value = T>,
+    PF: StructuredTarget<Value = T>,
     T: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

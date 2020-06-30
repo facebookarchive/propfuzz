@@ -132,7 +132,7 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
             #[allow(non_camel_case_types)]
             struct #struct_name;
 
-            impl ::propfuzz::Propfuzz for #struct_name {
+            impl ::propfuzz::traits::StructuredTarget for #struct_name {
                 type Value = (#(#types,)*);
 
                 fn name(&self) -> &'static str {
@@ -143,12 +143,12 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
                     #description
                 }
 
-                fn proptest_config(&self) -> ::propfuzz::test::test_runner::Config {
+                fn proptest_config(&self) -> ::propfuzz::proptest::test_runner::Config {
                     #proptest_config
                 }
 
-                fn execute(&self, __propfuzz_test_runner: &mut ::propfuzz::test::test_runner::TestRunner)
-                    -> ::std::result::Result<(), ::propfuzz::test::test_runner::TestError<Self::Value>> {
+                fn execute(&self, __propfuzz_test_runner: &mut ::propfuzz::proptest::test_runner::TestRunner)
+                    -> ::std::result::Result<(), ::propfuzz::proptest::test_runner::TestError<Self::Value>> {
                     #body
                 }
 
@@ -275,7 +275,7 @@ impl<'a> PropfuzzParam<'a> {
                 let strategy = strategy.parse_args::<Expr>()?;
                 quote! { #strategy }
             }
-            None => quote! { ::propfuzz::test::arbitrary::any::<#ty>() },
+            None => quote! { ::propfuzz::proptest::arbitrary::any::<#ty>() },
         };
 
         Ok(Self {

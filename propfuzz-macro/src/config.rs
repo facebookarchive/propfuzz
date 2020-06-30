@@ -80,7 +80,7 @@ impl ToTokens for ProptestConfig {
         let Self { cases, fork } = self;
 
         tokens.extend(quote! {
-            let mut config = ::propfuzz::test::test_runner::Config::default();
+            let mut config = ::propfuzz::proptest::test_runner::Config::default();
             config.fork = #fork;
             config.source_file = Some(file!());
         });

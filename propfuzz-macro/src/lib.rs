@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 //! Procedural macros for propfuzz tests.
+//!
+//! This library is **not** meant to be used directly. Use it through the `propfuzz` library.
 
 extern crate proc_macro;
 
