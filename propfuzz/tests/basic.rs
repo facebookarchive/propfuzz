@@ -3,12 +3,11 @@
 
 /// Basic tests for propfuzz-macro.
 use pretty_assertions::assert_eq;
-use propfuzz::test::{
+use propfuzz::{prelude::*, traits::StructuredTarget};
+use proptest::{
     collection::vec,
-    prelude::*,
     test_runner::{FileFailurePersistence, TestError, TestRunner},
 };
-use propfuzz::{propfuzz, Propfuzz};
 
 /// Basic test for foo.
 ///

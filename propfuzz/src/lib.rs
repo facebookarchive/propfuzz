@@ -6,15 +6,12 @@
 //! For more, see the [`README`](https://github.com/facebookincubator/propfuzz/blob/trunk/README.md)
 //! at the root of the `propfuzz` repository.
 
-mod propfuzz;
+pub mod prelude;
 pub mod runtime;
-
-pub use crate::propfuzz::*;
+pub mod traits;
 
 // Re-export the propfuzz macro -- this is expected to be the primary interface.
 #[cfg(feature = "macro")]
 pub use propfuzz_macro::propfuzz;
 
-// Re-export proptest to give access to its data structures.
-#[doc(no_inline)]
-pub use proptest as test;
+pub use proptest;
