@@ -6,6 +6,8 @@ edition = "2018"
 
 [lib]
 proc-macro = true
+# This is required by cargo readme -- related to https://github.com/livioribeiro/cargo-readme/pull/17.
+path = "src/lib.rs"
 
 [dependencies]
 proc-macro2 = "1.0.18"
