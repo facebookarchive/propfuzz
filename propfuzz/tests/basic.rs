@@ -129,3 +129,24 @@ fn propfuzz_multi() {
     assert_eq!(config.cases, 1024, "correct case count");
     assert_eq!(config.fork, true, "correct fork setting");
 }
+
+/// Test all proptest options.
+#[propfuzz(cases = 1, max_local_rejects = 2, max_global_rejects = 3)]
+#[propfuzz(max_flat_map_regens = 4, fork = true, timeout = 5, max_shrink_time = 6)]
+#[propfuzz(max_shrink_iters = 7, verbose = 8)]
+#[ignore]
+fn all_proptest_options(_: u8) {}
+
+#[test]
+fn propfuzz_all_proptest_options() {
+    let config = __PROPFUZZ__all_proptest_options.proptest_config();
+    assert_eq!(config.cases, 1);
+    assert_eq!(config.max_local_rejects, 2);
+    assert_eq!(config.max_global_rejects, 3);
+    assert_eq!(config.max_flat_map_regens, 4);
+    assert_eq!(config.fork, true);
+    assert_eq!(config.timeout, 5);
+    assert_eq!(config.max_shrink_time, 6);
+    assert_eq!(config.max_shrink_iters, 7);
+    assert_eq!(config.verbose, 8);
+}
