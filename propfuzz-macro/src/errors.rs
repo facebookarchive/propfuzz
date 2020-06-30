@@ -22,7 +22,7 @@ impl ErrorList {
     pub(crate) fn combine(&mut self, error: Error) {
         match self {
             ErrorList::None => {
-                mem::replace(self, ErrorList::Some(error));
+                let _ = mem::replace(self, ErrorList::Some(error));
             }
             ErrorList::Some(original) => original.combine(error),
         }
