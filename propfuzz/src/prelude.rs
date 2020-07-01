@@ -17,7 +17,7 @@
 //!
 //! /// Example test.
 //! #[propfuzz]
-//! fn test(#[strategy(vec(any::<u8>(), 0..64))] v: Vec<u8>) {
+//! fn test(#[propfuzz(strategy = "vec(any::<u8>(), 0..64)")] v: Vec<u8>) {
 //!     // ...
 //! }
 //! ```

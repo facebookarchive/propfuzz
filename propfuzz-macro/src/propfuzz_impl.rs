@@ -1,14 +1,15 @@
 // Copyright (c) The propfuzz Contributors
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
-use crate::config::{PropfuzzConfig, PropfuzzConfigBuilder};
+use crate::config::{
+    ConfigBuilder, ParamConfig, ParamConfigBuilder, PropfuzzConfig, PropfuzzConfigBuilder,
+};
 use crate::errors::*;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
-use syn::punctuated::Punctuated;
 use syn::{
-    Attribute, AttributeArgs, Block, Expr, FnArg, Index, ItemFn, Lit, Meta, NestedMeta, Pat,
-    PatType, Signature, Token, Type,
+    Attribute, AttributeArgs, Block, FnArg, Index, ItemFn, Lit, Meta, NestedMeta, Pat, PatType,
+    Signature, Type,
 };
 
 pub(crate) fn propfuzz_impl(attr: AttributeArgs, item: ItemFn) -> Result<TokenStream, TokenStream> {
@@ -71,13 +72,8 @@ impl<'a> PropfuzzFn<'a> {
             .attrs
             .iter()
             .partition::<Vec<_>, _>(|attr| attr.path.is_ident("propfuzz"));
-        for attr in propfuzz_attrs {
-            if let Some(args) = errors.combine_opt(|| {
-                attr.parse_args_with(Punctuated::<NestedMeta, Token![,]>::parse_terminated)
-            }) {
-                config_builder.apply_args(&args, &mut errors);
-            }
-        }
+
+        config_builder.apply_attrs(propfuzz_attrs, &mut errors);
 
         let body = match PropfuzzFnBody::new(&item.sig, &item.block) {
             Ok(body) => body,
@@ -219,7 +215,7 @@ impl<'a> PropfuzzFnBody<'a> {
     }
 
     fn strategies<'b>(&'b self) -> impl Iterator<Item = impl ToTokens + 'b> + 'b {
-        self.params.iter().map(|param| &param.strategy)
+        self.params.iter().map(|param| param.config.strategy())
     }
 
     fn name_pats<'b>(&'b self) -> impl Iterator<Item = impl ToTokens + 'b> + 'b {
@@ -251,38 +247,38 @@ impl<'a> ToTokens for PropfuzzFnBody<'a> {
 struct PropfuzzParam<'a> {
     name_pat: &'a Pat,
     ty: &'a Type,
-    strategy: TokenStream,
-    other_attrs: Vec<&'a Attribute>,
+    config: ParamConfig,
 }
 
 impl<'a> PropfuzzParam<'a> {
     fn new(param: &'a PatType) -> Result<Self> {
         let ty = &*param.ty;
 
-        let (strategy_attrs, other_attrs) = param
+        let mut errors = ErrorList::new();
+
+        let mut config_builder = ParamConfigBuilder::new(ty);
+        let (propfuzz_attrs, other_attrs) = param
             .attrs
             .iter()
-            .partition::<Vec<_>, _>(|attr| attr.path.is_ident("strategy"));
-        let mut strategy_iter = strategy_attrs.iter();
-        let strategy = match strategy_iter.next() {
-            Some(strategy) => {
-                if let Some(other_strategy) = strategy_iter.next() {
-                    return Err(Error::new_spanned(
-                        other_strategy,
-                        "an argument cannot have more than one strategy",
-                    ));
-                }
-                let strategy = strategy.parse_args::<Expr>()?;
-                quote! { #strategy }
-            }
-            None => quote! { ::propfuzz::proptest::arbitrary::any::<#ty>() },
-        };
+            .partition::<Vec<_>, _>(|attr| attr.path.is_ident("propfuzz"));
+
+        config_builder.apply_attrs(propfuzz_attrs, &mut errors);
+
+        // Non-propfuzz attributes on arguments aren't recognized (there's nowhere to put them!)
+        for attr in other_attrs {
+            errors.combine(Error::new_spanned(
+                attr,
+                "non-#[propfuzz] attributes are not supported",
+            ));
+        }
+
+        errors.finish()?;
+        let config = config_builder.finish();
 
         Ok(Self {
             name_pat: &param.pat,
             ty,
-            strategy,
-            other_attrs,
+            config,
         })
     }
 }

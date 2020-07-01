@@ -6,17 +6,33 @@
 use crate::errors::{Error, ErrorList, Result};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
-use syn::{spanned::Spanned, Lit, Meta, MetaNameValue, NestedMeta};
+use syn::punctuated::Punctuated;
+use syn::{spanned::Spanned, Attribute, Expr, Lit, Meta, MetaNameValue, NestedMeta, Token, Type};
 
-/// Configuration for a propfuzz target.
-#[derive(Debug, Default)]
-pub(crate) struct PropfuzzConfigBuilder {
-    proptest: ProptestConfig,
-}
+// ---
+// Config builders
+// ---
 
-impl PropfuzzConfigBuilder {
-    /// Adds arguments.
-    pub(crate) fn apply_args<'a>(
+pub(crate) trait ConfigBuilder {
+    fn apply_meta(&mut self, meta: &Meta, errors: &mut ErrorList);
+
+    /// Applies the given #[propfuzz] attributes.
+    fn apply_attrs<'a>(
+        &mut self,
+        attrs: impl IntoIterator<Item = &'a Attribute>,
+        errors: &mut ErrorList,
+    ) {
+        for attr in attrs {
+            if let Some(args) = errors.combine_opt(|| {
+                attr.parse_args_with(Punctuated::<NestedMeta, Token![,]>::parse_terminated)
+            }) {
+                self.apply_args(&args, errors);
+            }
+        }
+    }
+
+    /// Applies the given arguments.
+    fn apply_args<'a>(
         &mut self,
         args: impl IntoIterator<Item = &'a NestedMeta>,
         errors: &mut ErrorList,
@@ -26,81 +42,99 @@ impl PropfuzzConfigBuilder {
         }
     }
 
+    /// Applies a single argument.
     fn apply_arg(&mut self, arg: &NestedMeta, errors: &mut ErrorList) {
         match arg {
             NestedMeta::Meta(meta) => {
-                let path = meta.path();
-
-                if path.is_ident("cases") {
-                    errors.combine_fn(|| {
-                        replace_empty(meta.span(), &mut self.proptest.cases, read_u32(meta)?)
-                    });
-                } else if path.is_ident("max_local_rejects") {
-                    errors.combine_fn(|| {
-                        replace_empty(
-                            meta.span(),
-                            &mut self.proptest.max_local_rejects,
-                            read_u32(meta)?,
-                        )
-                    });
-                } else if path.is_ident("max_global_rejects") {
-                    errors.combine_fn(|| {
-                        replace_empty(
-                            meta.span(),
-                            &mut self.proptest.max_global_rejects,
-                            read_u32(meta)?,
-                        )
-                    });
-                } else if path.is_ident("max_flat_map_regens") {
-                    errors.combine_fn(|| {
-                        replace_empty(
-                            meta.span(),
-                            &mut self.proptest.max_flat_map_regens,
-                            read_u32(meta)?,
-                        )
-                    });
-                } else if path.is_ident("fork") {
-                    errors.combine_fn(|| {
-                        replace_empty(meta.span(), &mut self.proptest.fork, read_bool(meta)?)
-                    });
-                } else if path.is_ident("timeout") {
-                    errors.combine_fn(|| {
-                        replace_empty(meta.span(), &mut self.proptest.timeout, read_u32(meta)?)
-                    });
-                } else if path.is_ident("max_shrink_time") {
-                    errors.combine_fn(|| {
-                        replace_empty(
-                            meta.span(),
-                            &mut self.proptest.max_shrink_time,
-                            read_u32(meta)?,
-                        )
-                    });
-                } else if path.is_ident("max_shrink_iters") {
-                    errors.combine_fn(|| {
-                        replace_empty(
-                            meta.span(),
-                            &mut self.proptest.max_shrink_iters,
-                            read_u32(meta)?,
-                        )
-                    });
-                } else if path.is_ident("verbose") {
-                    errors.combine_fn(|| {
-                        replace_empty(meta.span(), &mut self.proptest.verbose, read_u32(meta)?)
-                    });
-                } else {
-                    errors.combine(Error::new_spanned(path, "argument not recognized"));
-                }
+                self.apply_meta(meta, errors);
             }
             NestedMeta::Lit(meta) => {
                 errors.combine(Error::new_spanned(meta, "expected key = value format"));
             }
         }
     }
+}
 
+// ---
+// Config for a function
+// ---
+
+/// Configuration for a propfuzz target.
+#[derive(Debug, Default)]
+pub(crate) struct PropfuzzConfigBuilder {
+    proptest: ProptestConfig,
+}
+
+impl PropfuzzConfigBuilder {
     /// Completes building args and returns a `PropfuzzConfig`.
     pub(crate) fn finish(self) -> PropfuzzConfig {
         PropfuzzConfig {
             proptest: self.proptest,
+        }
+    }
+}
+
+impl ConfigBuilder for PropfuzzConfigBuilder {
+    fn apply_meta(&mut self, meta: &Meta, errors: &mut ErrorList) {
+        let path = meta.path();
+        if path.is_ident("cases") {
+            errors.combine_fn(|| {
+                replace_empty(meta.span(), &mut self.proptest.cases, read_u32(meta)?)
+            });
+        } else if path.is_ident("max_local_rejects") {
+            errors.combine_fn(|| {
+                replace_empty(
+                    meta.span(),
+                    &mut self.proptest.max_local_rejects,
+                    read_u32(meta)?,
+                )
+            });
+        } else if path.is_ident("max_global_rejects") {
+            errors.combine_fn(|| {
+                replace_empty(
+                    meta.span(),
+                    &mut self.proptest.max_global_rejects,
+                    read_u32(meta)?,
+                )
+            });
+        } else if path.is_ident("max_flat_map_regens") {
+            errors.combine_fn(|| {
+                replace_empty(
+                    meta.span(),
+                    &mut self.proptest.max_flat_map_regens,
+                    read_u32(meta)?,
+                )
+            });
+        } else if path.is_ident("fork") {
+            errors.combine_fn(|| {
+                replace_empty(meta.span(), &mut self.proptest.fork, read_bool(meta)?)
+            });
+        } else if path.is_ident("timeout") {
+            errors.combine_fn(|| {
+                replace_empty(meta.span(), &mut self.proptest.timeout, read_u32(meta)?)
+            });
+        } else if path.is_ident("max_shrink_time") {
+            errors.combine_fn(|| {
+                replace_empty(
+                    meta.span(),
+                    &mut self.proptest.max_shrink_time,
+                    read_u32(meta)?,
+                )
+            });
+        } else if path.is_ident("max_shrink_iters") {
+            errors.combine_fn(|| {
+                replace_empty(
+                    meta.span(),
+                    &mut self.proptest.max_shrink_iters,
+                    read_u32(meta)?,
+                )
+            });
+        } else if path.is_ident("verbose") {
+            errors.combine_fn(|| {
+                replace_empty(meta.span(), &mut self.proptest.verbose, read_u32(meta)?)
+            });
+        } else {
+            errors.combine(Error::new_spanned(path, "argument not recognized"));
         }
     }
 }
@@ -171,6 +205,56 @@ impl ToTokens for ProptestConfig {
     }
 }
 
+// ---
+// Configuration for arguments
+// ---
+
+pub(crate) struct ParamConfigBuilder<'a> {
+    ty: &'a Type,
+    strategy: Option<Expr>,
+}
+
+impl<'a> ParamConfigBuilder<'a> {
+    pub(crate) fn new(ty: &'a Type) -> Self {
+        Self { ty, strategy: None }
+    }
+
+    pub(crate) fn finish(self) -> ParamConfig {
+        let ty = self.ty;
+        let strategy = match self.strategy {
+            Some(expr) => quote! { #expr },
+            None => quote! { ::propfuzz::proptest::arbitrary::any::<#ty>() },
+        };
+        ParamConfig { strategy }
+    }
+}
+
+impl<'a> ConfigBuilder for ParamConfigBuilder<'a> {
+    fn apply_meta(&mut self, meta: &Meta, errors: &mut ErrorList) {
+        let path = meta.path();
+        if path.is_ident("strategy") {
+            errors.combine_fn(|| replace_empty(meta.span(), &mut self.strategy, read_expr(meta)?));
+        } else {
+            errors.combine(Error::new_spanned(path, "argument not recognized"));
+        }
+    }
+}
+
+#[derive(Debug)]
+pub(crate) struct ParamConfig {
+    strategy: TokenStream,
+}
+
+impl ParamConfig {
+    pub(crate) fn strategy(&self) -> &TokenStream {
+        &self.strategy
+    }
+}
+
+// ---
+// Helper functions
+// ---
+
 fn read_bool(meta: &Meta) -> Result<bool> {
     let name_value = name_value(meta)?;
     match &name_value.lit {
@@ -184,6 +268,17 @@ fn read_u32(meta: &Meta) -> Result<u32> {
     match &name_value.lit {
         Lit::Int(lit) => Ok(lit.base10_parse::<u32>()?),
         _ => Err(Error::new_spanned(&name_value.lit, "expected integer")),
+    }
+}
+
+fn read_expr(meta: &Meta) -> Result<Expr> {
+    let name_value = name_value(meta)?;
+    match &name_value.lit {
+        Lit::Str(lit) => Ok(lit.parse::<Expr>()?),
+        _ => Err(Error::new_spanned(
+            &name_value.lit,
+            "expected expression string",
+        )),
     }
 }
 

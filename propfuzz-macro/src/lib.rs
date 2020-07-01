@@ -25,13 +25,14 @@ mod propfuzz_impl;
 ///
 /// ```
 /// // The prelude imports the `propfuzz` macro.
+///
 /// use propfuzz::prelude::*;
 /// use proptest::collection::vec;
 ///
 /// /// Reversing a list twice produces the same result.
 /// #[propfuzz]
 /// fn reverse(
-///     #[strategy(vec(any::<u32>(), 0..64))]
+///     #[propfuzz(strategy = "vec(any::<u32>(), 0..64)")]
 ///     mut list: Vec<u32>,
 /// ) {
 ///     let list2 = list.clone();
@@ -55,7 +56,7 @@ mod propfuzz_impl;
 /// #[propfuzz(cases = 1024, max_local_rejects = 10000)]
 /// #[propfuzz(fork = true)]
 /// fn reverse(
-///     #[strategy(vec(any::<u32>(), 0..64))]
+///     #[propfuzz(strategy = "vec(any::<u32>(), 0..64)")]
 ///     mut list: Vec<u32>,
 /// ) {
 ///     let list2 = list.clone();
@@ -80,6 +81,17 @@ mod propfuzz_impl;
 /// * `max_shrink_time`
 /// * `max_shrink_iters`
 /// * `verbose`
+///
+/// ## Argument configuration
+///
+/// The following configuration options are supported on individual arguments:
+///
+/// * `strategy`: A strategy to generate and shrink values of the given type. The value must be a
+///   string that parses as a Rust expression which evaluates to an implementation of
+///   [`Strategy`](https://docs.rs/proptest/0.10/proptest/strategy/trait.Strategy.html)
+///   for the given type. Defaults to [the
+///   canonical strategy](https://docs.rs/proptest/0.10/proptest/arbitrary/trait.Arbitrary.html)
+///   for the type.
 #[proc_macro_attribute]
 pub fn propfuzz(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr = parse_macro_input!(attr as AttributeArgs);
