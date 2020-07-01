@@ -51,7 +51,7 @@ then have them automatically converted to fuzz targets. For example:
 ```rust
 /// Test that reversing a list twice produces the same result.
 #[propfuzz(cases = 1024)]
-fn reverse(#[strategy(vec(any::<u32>(), 0..64))] mut list: Vec<u32>) {
+fn reverse(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>) {
     let list2 = list.clone();
     list.reverse();
     list.reverse();

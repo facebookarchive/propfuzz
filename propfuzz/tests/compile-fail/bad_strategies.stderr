@@ -1,0 +1,36 @@
+error: expected key = value format
+  --> $DIR/bad_strategies.rs:12:28
+   |
+12 | fn wrong_format(#[propfuzz(strategy(foo))] _: u8) {}
+   |                            ^^^^^^^^^^^^^
+
+error: expected expression
+  --> $DIR/bad_strategies.rs:16:39
+   |
+16 | fn invalid_expr(#[propfuzz(strategy = "_")] _: u8) {}
+   |                                       ^^^
+
+error: non-#[propfuzz] attributes are not supported
+  --> $DIR/bad_strategies.rs:24:17
+   |
+24 | fn unknown_attr(#[foo] _: u8) {}
+   |                 ^^^^^^
+
+error[E0425]: cannot find function `xxxxxxx` in this scope
+  --> $DIR/bad_strategies.rs:20:39
+   |
+20 | fn unknown_name(#[propfuzz(strategy = "xxxxxxx(any::<u64>(), 0..8)")] _: HashSet<u64>) {}
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0308]: mismatched types
+  --> $DIR/bad_strategies.rs:27:1
+   |
+27 | #[propfuzz]
+   | ^^^^^^^^^^^
+   | |
+   | expected struct `std::collections::HashSet`, found struct `std::vec::Vec`
+   | expected `std::result::Result<(), proptest::test_runner::errors::TestError<(std::collections::HashSet<u64>,)>>` because of return type
+   |
+   = note: expected enum `std::result::Result<_, proptest::test_runner::errors::TestError<(std::collections::HashSet<u64>,)>>`
+              found enum `std::result::Result<_, proptest::test_runner::errors::TestError<(std::vec::Vec<u64>,)>>`
+   = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)

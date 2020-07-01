@@ -29,8 +29,8 @@ fn unsupported_kinds(_: u8) {}
 #[propfuzz(cases = 256)]
 #[propfuzz(cases = 512)]
 fn repeated_strategy(
-    #[strategy(any::<u8>())]
-    #[strategy(any::<u8>())]
+    #[propfuzz(strategy = "any::<u8>()")]
+    #[propfuzz(strategy = "any::<u8>()")]
     _: u8,
 ) {
 }

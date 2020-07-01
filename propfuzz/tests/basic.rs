@@ -55,7 +55,7 @@ fn propfuzz_add_pair() {
 
 /// Test that reversing a list twice produces the same results.
 #[propfuzz(cases = 1024)]
-fn reverse(#[strategy(vec(any::<u32>(), 0..64))] mut list: Vec<u32>) {
+fn reverse(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>) {
     let list2 = list.clone();
     list.reverse();
     list.reverse();
@@ -78,7 +78,7 @@ fn propfuzz_reverse() {
 /// This test fails. It is ignored by default and can be run with `cargo test -- --ignored`.
 #[propfuzz]
 #[ignore]
-fn failing(#[strategy(vec(any::<u32>(), 0..64))] mut list: Vec<u32>) {
+fn failing(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>) {
     let list2 = list.clone();
     // The list is only reversed once.
     list.reverse();

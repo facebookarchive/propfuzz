@@ -46,8 +46,8 @@ error: key specified more than once
 30 | #[propfuzz(cases = 512)]
    |            ^^^^^
 
-error: an argument cannot have more than one strategy
-  --> $DIR/bad-args.rs:33:5
+error: key specified more than once
+  --> $DIR/bad-args.rs:33:16
    |
-33 |     #[strategy(any::<u8>())]
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+33 |     #[propfuzz(strategy = "any::<u8>()")]
+   |                ^^^^^^^^
