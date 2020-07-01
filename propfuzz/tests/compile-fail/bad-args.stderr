@@ -16,38 +16,32 @@ error: key specified more than once
 13 | #[propfuzz(cases = 1024, cases = 2048)]
    |                          ^^^^^
 
-error: #[propfuzz] requires a description as a doc comment
-  --> $DIR/bad-args.rs:20:1
-   |
-20 | fn repeated2(_: Vec<u8>) {}
-   | ^^^^^^^^^^^^^^^^^^^^^^^^
-
 error: key specified more than once
-  --> $DIR/bad-args.rs:19:12
+  --> $DIR/bad-args.rs:17:12
    |
-19 | #[propfuzz(cases = 2048)]
+17 | #[propfuzz(cases = 2048)]
    |            ^^^^^
 
 error: argument not recognized
-  --> $DIR/bad-args.rs:24:12
+  --> $DIR/bad-args.rs:22:12
    |
-24 | #[propfuzz(wat)]
+22 | #[propfuzz(wat)]
    |            ^^^
 
 error: expected parentheses: #[propfuzz(...)]
-  --> $DIR/bad-args.rs:25:12
+  --> $DIR/bad-args.rs:23:12
    |
-25 | #[propfuzz = "wat"]
+23 | #[propfuzz = "wat"]
    |            ^
 
 error: key specified more than once
-  --> $DIR/bad-args.rs:30:12
+  --> $DIR/bad-args.rs:28:12
    |
-30 | #[propfuzz(cases = 512)]
+28 | #[propfuzz(cases = 512)]
    |            ^^^^^
 
 error: key specified more than once
-  --> $DIR/bad-args.rs:33:16
+  --> $DIR/bad-args.rs:31:16
    |
-33 |     #[propfuzz(strategy = "any::<u8>()")]
+31 |     #[propfuzz(strategy = "any::<u8>()")]
    |                ^^^^^^^^

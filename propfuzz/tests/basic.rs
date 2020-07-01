@@ -22,7 +22,9 @@ fn add_two(a: u64, b: u64) {
 fn propfuzz_add_two() {
     assert_eq!(__PROPFUZZ__add_two.name(), "basic::add_two");
     assert_eq!(
-        __PROPFUZZ__add_two.description(),
+        __PROPFUZZ__add_two
+            .description()
+            .expect("expected description"),
         "Basic test for foo.\n\
         \n\
         This is a simple test which ensures that adding two numbers returns the expected result."
@@ -33,7 +35,6 @@ fn propfuzz_add_two() {
     assert_eq!(config.fork, false, "correct fork setting");
 }
 
-/// Pairs should parse just like individual values.
 #[propfuzz(fork = true)]
 fn add_pair((a, b): (u64, u64)) {
     let sum = a.checked_add(b);
@@ -43,9 +44,9 @@ fn add_pair((a, b): (u64, u64)) {
 #[test]
 fn propfuzz_add_pair() {
     assert_eq!(__PROPFUZZ__add_pair.name(), "basic::add_pair");
-    assert_eq!(
-        __PROPFUZZ__add_pair.description(),
-        "Pairs should parse just like individual values."
+    assert!(
+        __PROPFUZZ__add_pair.description().is_none(),
+        "no doc comment"
     );
 
     let config = __PROPFUZZ__add_pair.proptest_config();
@@ -66,7 +67,9 @@ fn reverse(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>
 fn propfuzz_reverse() {
     assert_eq!(__PROPFUZZ__reverse.name(), "basic::reverse");
     assert_eq!(
-        __PROPFUZZ__reverse.description(),
+        __PROPFUZZ__reverse
+            .description()
+            .expect("expected description"),
         "Test that reversing a list twice produces the same results."
     );
 
@@ -89,7 +92,9 @@ fn failing(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>
 fn propfuzz_failing() {
     assert_eq!(__PROPFUZZ__failing.name(), "basic::failing");
     assert_eq!(
-        __PROPFUZZ__failing.description(),
+        __PROPFUZZ__failing
+            .description()
+            .expect("expected description"),
         "This test fails. It is ignored by default and can be run with `cargo test -- --ignored`."
     );
 
@@ -121,7 +126,9 @@ fn multi(_: Vec<u8>) {}
 fn propfuzz_multi() {
     assert_eq!(__PROPFUZZ__multi.name(), "basic::multi");
     assert_eq!(
-        __PROPFUZZ__multi.description(),
+        __PROPFUZZ__multi
+            .description()
+            .expect("expected description"),
         "Test multiple #[propfuzz] annotations."
     );
 

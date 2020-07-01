@@ -13,8 +13,6 @@ fn wrong_type1(_: u8) {}
 #[propfuzz(cases = 1024, cases = 2048)]
 fn repeated1(_: Vec<u8>) {}
 
-// Test lack of description for repeated2 as well.
-
 #[propfuzz(cases = 1024)]
 #[propfuzz(cases = 2048)]
 fn repeated2(_: Vec<u8>) {}
