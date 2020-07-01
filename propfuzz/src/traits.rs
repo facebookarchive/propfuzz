@@ -28,8 +28,8 @@ pub trait StructuredTarget: Send + Sync + fmt::Debug {
     /// Returns the name of this structured fuzz target.
     fn name(&self) -> &'static str;
 
-    /// Returns a description for this structured fuzz target.
-    fn description(&self) -> &'static str;
+    /// Returns an optional description for this structured fuzz target.
+    fn description(&self) -> Option<&'static str>;
 
     /// Returns the proptest config for this fuzz target.
     ///

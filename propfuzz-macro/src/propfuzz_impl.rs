@@ -25,7 +25,7 @@ pub(crate) fn propfuzz_impl(attr: AttributeArgs, item: ItemFn) -> Result<TokenSt
 #[derive(Debug)]
 struct PropfuzzFn<'a> {
     name: &'a Ident,
-    description: String,
+    description: Option<String>,
     other_attrs: Vec<&'a Attribute>,
     config: PropfuzzConfig,
     struct_name: Ident,
@@ -59,12 +59,10 @@ impl<'a> PropfuzzFn<'a> {
                 })
                 .collect::<Result<Vec<_>>>()?;
             if description.is_empty() {
-                errors.combine(Error::new_spanned(
-                    &item.sig,
-                    "#[propfuzz] requires a description as a doc comment",
-                ));
+                None
+            } else {
+                Some(description.join("\n"))
             }
-            description.join("\n")
         };
 
         // Read arguments from remaining #[propfuzz] attributes.
@@ -108,6 +106,12 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
             ..
         } = self;
 
+        // The ToTokens impl for Option isn't quite what we want, so do this by hand.
+        let description = match description {
+            Some(s) => quote! { Some(#s) },
+            None => quote! { None },
+        };
+
         let proptest_config = &config.proptest;
         let types = body.types();
         let name_pats = body.name_pats();
@@ -135,7 +139,7 @@ impl<'a> ToTokens for PropfuzzFn<'a> {
                     concat!(module_path!(), "::", stringify!(#name))
                 }
 
-                fn description(&self) -> &'static str {
+                fn description(&self) -> Option<&'static str> {
                     #description
                 }
 
