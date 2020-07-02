@@ -1,5 +1,11 @@
 # propfuzz-macro
 
+[![propfuzz-macro on crates.io](https://img.shields.io/crates/v/propfuzz-macro)](https://crates.io/crates/propfuzz-macro)
+[![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz-macro/)
+[![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz_macro/)
+[![License](https://img.shields.io/badge/license-Apache-green.svg)](../LICENSE-APACHE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE-MIT)
+
 Procedural macros for propfuzz tests.
 
 This crate is an implementation detail of `propfuzz` and is **not** meant to be used directly.
