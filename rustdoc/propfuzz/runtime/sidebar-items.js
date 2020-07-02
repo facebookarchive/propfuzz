@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["execute_as_proptest","Executes a propfuzz target as a standard property-based test."]]});

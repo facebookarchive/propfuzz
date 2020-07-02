@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `propfuzz` attr in crate `propfuzz`."><meta name="keywords" content="rust, rustlang, rust-lang, propfuzz"><title>propfuzz::propfuzz - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc attr"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../propfuzz/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class='location'><a href='index.html'>propfuzz</a></p><script>window.sidebarCurrent = {name: 'propfuzz', ty: 'attr', relpath: ''};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/propfuzz_macro/lib.rs.html#103-110' title='goto source code'>[src]</a></span><span class='in-band'>Attribute Macro <a href='index.html'>propfuzz</a>::<wbr><a class="attr" href=''>propfuzz</a></span></h1><pre class='rust attr'>#[propfuzz]</pre><div class='docblock'><p>The core macro, used to annotate test methods.</p>
+<p>Annotate a function with this in order to have it run as a property-based test using the
+<a href="https://docs.rs/proptest"><code>proptest</code></a> framework. In the future, such tests will also be
+available as fuzz targets.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="comment">// The prelude imports the `propfuzz` macro.</span>
+
+<span class="kw">use</span> <span class="ident">propfuzz</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">proptest</span>::<span class="ident">collection</span>::<span class="ident">vec</span>;
+
+<span class="doccomment">/// Reversing a list twice produces the same result.</span>
+<span class="attribute">#[<span class="ident">propfuzz</span>]</span>
+<span class="kw">fn</span> <span class="ident">reverse</span>(
+    <span class="attribute">#[<span class="ident">propfuzz</span>(<span class="ident">strategy</span> <span class="op">=</span> <span class="string">&quot;vec(any::&lt;u32&gt;(), 0..64)&quot;</span>)]</span>
+    <span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">let</span> <span class="ident">list2</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">clone</span>();
+    <span class="ident">list</span>.<span class="ident">reverse</span>();
+    <span class="ident">list</span>.<span class="ident">reverse</span>();
+    <span class="macro">prop_assert_eq</span><span class="macro">!</span>(<span class="ident">list</span>, <span class="ident">list2</span>);
+}</pre></div>
+<h1 id="arguments" class="section-header"><a href="#arguments">Arguments</a></h1>
+<p><code>propfuzz</code> supports a number of arguments which can be used to customize test behavior.</p>
+<p>Attributes can be broken up with commas and split up across multiple lines like so:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">propfuzz</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">proptest</span>::<span class="ident">collection</span>::<span class="ident">vec</span>;
+
+<span class="doccomment">/// Options broken up across multiple lines.</span>
+<span class="attribute">#[<span class="ident">propfuzz</span>(<span class="ident">cases</span> <span class="op">=</span> <span class="number">1024</span>, <span class="ident">max_local_rejects</span> <span class="op">=</span> <span class="number">10000</span>)]</span>
+<span class="attribute">#[<span class="ident">propfuzz</span>(<span class="ident">fork</span> <span class="op">=</span> <span class="bool-val">true</span>)]</span>
+<span class="kw">fn</span> <span class="ident">reverse</span>(
+    <span class="attribute">#[<span class="ident">propfuzz</span>(<span class="ident">strategy</span> <span class="op">=</span> <span class="string">&quot;vec(any::&lt;u32&gt;(), 0..64)&quot;</span>)]</span>
+    <span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+) {
+    <span class="kw">let</span> <span class="ident">list2</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">clone</span>();
+    <span class="ident">list</span>.<span class="ident">reverse</span>();
+    <span class="ident">list</span>.<span class="ident">reverse</span>();
+    <span class="macro">prop_assert_eq</span><span class="macro">!</span>(<span class="ident">list</span>, <span class="ident">list2</span>);
+}</pre></div>
+<h2 id="fuzzing-configuration" class="section-header"><a href="#fuzzing-configuration">Fuzzing configuration</a></h2>
+<p>These arguments are currently unused but may be set. They will be used in the future once fuzzing support is
+available.</p>
+<ul>
+<li><code>fuzz_default</code>: whether to fuzz this target by default. Defaults to <code>false</code>.</li>
+</ul>
+<h2 id="proptest-configuration" class="section-header"><a href="#proptest-configuration">Proptest configuration</a></h2>
+<p>The following <code>proptest</code>
+<a href="https://docs.rs/proptest/0.10/proptest/test_runner/struct.Config.html">configuration options</a>
+are supported:</p>
+<ul>
+<li><code>cases</code></li>
+<li><code>max_local_rejects</code></li>
+<li><code>max_global_rejects</code></li>
+<li><code>max_flat_map_regens</code></li>
+<li><code>fork</code></li>
+<li><code>timeout</code></li>
+<li><code>max_shrink_time</code></li>
+<li><code>max_shrink_iters</code></li>
+<li><code>verbose</code></li>
+</ul>
+<h2 id="argument-configuration" class="section-header"><a href="#argument-configuration">Argument configuration</a></h2>
+<p>The following configuration options are supported on individual arguments:</p>
+<ul>
+<li><code>strategy</code>: A strategy to generate and shrink values of the given type. The value must be a
+string that parses as a Rust expression which evaluates to an implementation of
+<a href="https://docs.rs/proptest/0.10/proptest/strategy/trait.Strategy.html"><code>Strategy</code></a>
+for the given type. Defaults to <a href="https://docs.rs/proptest/0.10/proptest/arbitrary/trait.Arbitrary.html">the
+canonical strategy</a>
+for the type.</li>
+</ul>
+</div></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "propfuzz";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
