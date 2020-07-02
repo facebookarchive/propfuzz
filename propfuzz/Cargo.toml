@@ -16,12 +16,12 @@ exclude = [
 all-features = true
 
 [dependencies]
-proptest = "0.10"
+proptest = "0.10.0"
 propfuzz-macro = { path = "../propfuzz-macro", version = "0.0.1", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
-trybuild = "1"
+trybuild = "1.0.30"
 
 [features]
 default = ["macro"]
