@@ -3,6 +3,8 @@ on:
     branches:
       - trunk
 
+name: Docs
+
 jobs:
   docs:
     name: Build and deploy documentation
