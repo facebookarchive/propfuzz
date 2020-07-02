@@ -62,6 +62,7 @@ pub(crate) trait ConfigBuilder {
 /// Configuration for a propfuzz target.
 #[derive(Debug, Default)]
 pub(crate) struct PropfuzzConfigBuilder {
+    fuzz_default: Option<bool>,
     proptest: ProptestConfig,
 }
 
@@ -69,6 +70,7 @@ impl PropfuzzConfigBuilder {
     /// Completes building args and returns a `PropfuzzConfig`.
     pub(crate) fn finish(self) -> PropfuzzConfig {
         PropfuzzConfig {
+            fuzz_default: self.fuzz_default.unwrap_or(false),
             proptest: self.proptest,
         }
     }
@@ -77,7 +79,12 @@ impl PropfuzzConfigBuilder {
 impl ConfigBuilder for PropfuzzConfigBuilder {
     fn apply_meta(&mut self, meta: &Meta, errors: &mut ErrorList) {
         let path = meta.path();
-        if path.is_ident("cases") {
+
+        if path.is_ident("fuzz_default") {
+            errors.combine_fn(|| {
+                replace_empty(meta.span(), &mut self.fuzz_default, read_bool(meta)?)
+            });
+        } else if path.is_ident("cases") {
             errors.combine_fn(|| {
                 replace_empty(meta.span(), &mut self.proptest.cases, read_u32(meta)?)
             });
@@ -142,6 +149,8 @@ impl ConfigBuilder for PropfuzzConfigBuilder {
 /// Overall config for a single propfuzz function, fully built.
 #[derive(Debug)]
 pub(crate) struct PropfuzzConfig {
+    // fuzz_default is currently unused.
+    fuzz_default: bool,
     pub(crate) proptest: ProptestConfig,
 }
 
