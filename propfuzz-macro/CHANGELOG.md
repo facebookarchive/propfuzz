@@ -4,4 +4,4 @@
 ### Added
 - Initial release.
 
-[0.0.1]: https://github.com/facebookincubator/cargo-guppy/releases/tag/propfuzz-0.0.1
+[0.0.1]: https://github.com/facebookincubator/cargo-guppy/releases/tag/propfuzz-macro-0.0.1
