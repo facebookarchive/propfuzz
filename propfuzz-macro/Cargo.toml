@@ -1,8 +1,19 @@
 [package]
 name = "propfuzz-macro"
-version = "0.1.0"
+version = "0.0.1"
+description = "Support macro for propfuzz."
+repository = "https://github.com/facebookincubator/propfuzz"
 authors = ["Rain <rain1@fb.com>"]
+license = "MIT OR Apache-2.0"
 edition = "2018"
+readme = "README.md"
+exclude = [
+    # Readme template that doesn't need to be included.
+    "README.tpl",
+]
+
+[package.metadata.docs.rs]
+all-features = true
 
 [lib]
 proc-macro = true

@@ -132,20 +132,20 @@ dependencies = [
 
 [[package]]
 name = "propfuzz"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "propfuzz-macro 0.1.0",
+ "propfuzz-macro 0.0.1",
  "proptest 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "trybuild 1.0.30 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "propfuzz-macro"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "proc-macro2 1.0.18 (registry+https://github.com/rust-lang/crates.io-index)",
- "propfuzz 0.1.0",
+ "propfuzz 0.0.1",
  "quote 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 1.0.33 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
