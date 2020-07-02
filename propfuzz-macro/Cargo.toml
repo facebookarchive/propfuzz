@@ -12,6 +12,9 @@ exclude = [
     "README.tpl",
 ]
 
+[badges]
+maintenance = { status = "actively-developed" }
+
 [package.metadata.docs.rs]
 all-features = true
 

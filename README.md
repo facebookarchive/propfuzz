@@ -1,10 +1,21 @@
 # propfuzz: Rust tools to combine coverage-guided fuzzing with property-based testing
 
+[![Build status](https://github.com/facebookincubator/propfuzz/workflows/CI/badge.svg?branch=trunk)](https://github.com/facebookincubator/propfuzz/actions?query=workflow%3ACI+branch%3Atrunk)
+[![License](https://img.shields.io/badge/license-Apache-green.svg)](LICENSE-APACHE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE-MIT)
+
 This repository contains the source code for:
 
 * [`propfuzz`](propfuzz): a Rust library for adapting the [`proptest`](https://github.com/AltSysrq/proptest/) framework
-  with coverage-guided fuzzers. 
-* [`propfuzz-macro`](propfuzz-macro): procedural macros to make writing `propfuzz` tests easy 
+  with coverage-guided fuzzers
+  [![propfuzz on crates.io](https://img.shields.io/crates/v/propfuzz)](https://crates.io/crates/propfuzz)
+  [![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz/)
+  [![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz/)
+
+* [`propfuzz-macro`](propfuzz-macro): a procedural macro that forms the main interface for `propfuzz`
+  [![propfuzz-macro on crates.io](https://img.shields.io/crates/v/propfuzz-macro)](https://crates.io/crates/propfuzz-macro)
+  [![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz-macro/)
+  [![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz_macro/)
 
 The code in this repository is in a **very early** state and is under active development.
 

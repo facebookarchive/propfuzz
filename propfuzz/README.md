@@ -1,5 +1,11 @@
 # propfuzz
 
+[![propfuzz on crates.io](https://img.shields.io/crates/v/propfuzz)](https://crates.io/crates/propfuzz)
+[![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz/)
+[![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz/)
+[![License](https://img.shields.io/badge/license-Apache-green.svg)](../LICENSE-APACHE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](../LICENSE-MIT)
+
 Rust toolkit to combine property-based testing with fuzzing.
 
 For more, see the [`README`](https://github.com/facebookincubator/propfuzz/blob/trunk/README.md)
