@@ -79,7 +79,7 @@ fn propfuzz_reverse() {
 }
 
 /// This test fails. It is ignored by default and can be run with `cargo test -- --ignored`.
-#[propfuzz]
+#[propfuzz(fuzz_default = true)]
 #[ignore]
 fn failing(#[propfuzz(strategy = "vec(any::<u32>(), 0..64)")] mut list: Vec<u32>) {
     let list2 = list.clone();

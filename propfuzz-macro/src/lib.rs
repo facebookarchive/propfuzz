@@ -66,6 +66,13 @@ mod propfuzz_impl;
 /// }
 /// ```
 ///
+/// ## Fuzzing configuration
+///
+/// These arguments are currently unused but may be set. They will be used in the future once fuzzing support is
+/// available.
+///
+/// * `fuzz_default`: whether to fuzz this target by default. Defaults to `false`.
+///
 /// ## Proptest configuration
 ///
 /// The following `proptest`
