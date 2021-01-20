@@ -214,15 +214,15 @@ impl<'a> PropfuzzFnBody<'a> {
         self.params.len()
     }
 
-    fn types<'b>(&'b self) -> impl Iterator<Item = impl ToTokens + 'b> + 'b {
+    fn types(&self) -> impl Iterator<Item = impl ToTokens + '_> + '_ {
         self.params.iter().map(|param| param.ty)
     }
 
-    fn strategies<'b>(&'b self) -> impl Iterator<Item = impl ToTokens + 'b> + 'b {
+    fn strategies(&self) -> impl Iterator<Item = impl ToTokens + '_> + '_ {
         self.params.iter().map(|param| param.config.strategy())
     }
 
-    fn name_pats<'b>(&'b self) -> impl Iterator<Item = impl ToTokens + 'b> + 'b {
+    fn name_pats(&self) -> impl Iterator<Item = impl ToTokens + '_> + '_ {
         self.params.iter().map(|param| param.name_pat)
     }
 }
