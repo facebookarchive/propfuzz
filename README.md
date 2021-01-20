@@ -1,6 +1,6 @@
 # propfuzz: Rust tools to combine coverage-guided fuzzing with property-based testing
 
-[![Build status](https://github.com/facebookincubator/propfuzz/workflows/CI/badge.svg?branch=trunk)](https://github.com/facebookincubator/propfuzz/actions?query=workflow%3ACI+branch%3Atrunk)
+[![Build status](https://github.com/facebookincubator/propfuzz/workflows/CI/badge.svg?branch=main)](https://github.com/facebookincubator/propfuzz/actions?query=workflow%3ACI+branch%3Amain)
 [![License](https://img.shields.io/badge/license-Apache-green.svg)](LICENSE-APACHE)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE-MIT)
 
@@ -10,14 +10,17 @@ This repository contains the source code for:
   with coverage-guided fuzzers
   [![propfuzz on crates.io](https://img.shields.io/crates/v/propfuzz)](https://crates.io/crates/propfuzz)
   [![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz/)
-  [![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz/)
+  [![Documentation (main)](https://img.shields.io/badge/docs-main-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz/)
 
 * [`propfuzz-macro`](propfuzz-macro): a procedural macro that forms the main interface for `propfuzz`
   [![propfuzz-macro on crates.io](https://img.shields.io/crates/v/propfuzz-macro)](https://crates.io/crates/propfuzz-macro)
   [![Documentation (latest release)](https://docs.rs/propfuzz/badge.svg)](https://docs.rs/propfuzz-macro/)
-  [![Documentation (trunk)](https://img.shields.io/badge/docs-trunk-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz_macro/)
+  [![Documentation (main)](https://img.shields.io/badge/docs-main-brightgreen)](https://facebookincubator.github.io/propfuzz/rustdoc/propfuzz_macro/)
 
-The code in this repository is in a **very early** state and is under active development.
+# Project status
+
+Development on the `propfuzz` project is currently paused and the project is not yet production-ready. We plan to
+revisit this decision in 2021, possibly expanding the scope to cover parameterized tests in general.
 
 ## Vision
 

@@ -3,7 +3,7 @@
 
 //! Rust toolkit to combine property-based testing with fuzzing.
 //!
-//! For more, see the [`README`](https://github.com/facebookincubator/propfuzz/blob/trunk/README.md)
+//! For more, see the [`README`](https://github.com/facebookincubator/propfuzz/blob/main/README.md)
 //! at the root of the `propfuzz` repository.
 
 pub mod prelude;
