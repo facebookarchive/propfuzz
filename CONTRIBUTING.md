@@ -12,7 +12,7 @@ beforehand to ensure it will be accepted.
 
 To create a new pull request:
 
-1. Fork the repo and create your branch from `trunk`.
+1. Fork the repo and create your branch from `main`.
 2. If you've added code that should be tested (i.e. not just a refactor), add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes with `cargo test --all-features`.

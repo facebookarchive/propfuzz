@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - trunk
+      - main
 
 name: Docs
 
