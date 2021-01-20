@@ -4,11 +4,11 @@ error: expected key = value format
 12 | fn wrong_format(#[propfuzz(strategy(foo))] _: u8) {}
    |                            ^^^^^^^^^^^^^
 
-error: expected expression
+error: expected expression, found reserved identifier `_`
   --> $DIR/bad_strategies.rs:16:39
    |
 16 | fn invalid_expr(#[propfuzz(strategy = "_")] _: u8) {}
-   |                                       ^^^
+   |                                       ^^^ expected expression
 
 error: non-#[propfuzz] attributes are not supported
   --> $DIR/bad_strategies.rs:24:17
@@ -28,9 +28,9 @@ error[E0308]: mismatched types
 27 | #[propfuzz]
    | ^^^^^^^^^^^
    | |
-   | expected struct `std::collections::HashSet`, found struct `std::vec::Vec`
-   | expected `std::result::Result<(), proptest::test_runner::errors::TestError<(std::collections::HashSet<u64>,)>>` because of return type
+   | expected struct `HashSet`, found struct `Vec`
+   | expected `std::result::Result<(), TestError<(HashSet<u64>,)>>` because of return type
    |
-   = note: expected enum `std::result::Result<_, proptest::test_runner::errors::TestError<(std::collections::HashSet<u64>,)>>`
-              found enum `std::result::Result<_, proptest::test_runner::errors::TestError<(std::vec::Vec<u64>,)>>`
+   = note: expected enum `std::result::Result<_, TestError<(HashSet<u64>,)>>`
+              found enum `std::result::Result<_, TestError<(Vec<u64>,)>>`
    = note: this error originates in an attribute macro (in Nightly builds, run with -Z macro-backtrace for more info)
