@@ -4,11 +4,11 @@ error: expected key = value format
 12 | fn wrong_format(#[propfuzz(strategy(foo))] _: u8) {}
    |                            ^^^^^^^^^^^^^
 
-error: expected expression, found reserved identifier `_`
+error: expected expression
   --> $DIR/bad_strategies.rs:16:39
    |
 16 | fn invalid_expr(#[propfuzz(strategy = "_")] _: u8) {}
-   |                                       ^^^ expected expression
+   |                                       ^^^
 
 error: non-#[propfuzz] attributes are not supported
   --> $DIR/bad_strategies.rs:24:17
