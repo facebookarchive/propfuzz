@@ -19,7 +19,7 @@ maintenance = { status = "actively-developed" }
 all-features = true
 
 [dependencies]
-proptest = "0.10.1"
+proptest = "1.0.0"
 propfuzz-macro = { path = "../propfuzz-macro", version = "0.0.1", optional = true }
 
 [dev-dependencies]
