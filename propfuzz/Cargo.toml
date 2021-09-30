@@ -23,7 +23,7 @@ proptest = "1.0.0"
 propfuzz-macro = { path = "../propfuzz-macro", version = "0.0.1", optional = true }
 
 [dev-dependencies]
-pretty_assertions = "0.7.2"
+pretty_assertions = "1.0.0"
 trybuild = "1.0.43"
 
 [features]
