@@ -24,7 +24,7 @@ propfuzz-macro = { path = "../propfuzz-macro", version = "0.0.1", optional = tru
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
-trybuild = "1.0.52"
+trybuild = "1.0.53"
 
 [features]
 default = ["macro"]
